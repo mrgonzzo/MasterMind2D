@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 3062478}
   - component: {fileID: 3062479}
   m_Layer: 0
-  m_Name: Color_1
+  m_Name: ColorPin_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 107303908}
   - component: {fileID: 107303909}
   m_Layer: 0
-  m_Name: Color_4
+  m_Name: ColorPin_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -758,7 +758,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.79013884, g: 0.8203888, b: 0.8679245, a: 0}
+  m_BackGroundColor: {r: 0.104530096, g: 0.16460487, b: 0.254717, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -825,7 +825,7 @@ GameObject:
   - component: {fileID: 585228939}
   - component: {fileID: 585228940}
   m_Layer: 0
-  m_Name: Color_3
+  m_Name: ColorPin_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1118,7 +1118,7 @@ GameObject:
   - component: {fileID: 762767452}
   - component: {fileID: 762767453}
   m_Layer: 0
-  m_Name: Color_6
+  m_Name: ColorPin_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1441,7 +1441,7 @@ GameObject:
   - component: {fileID: 985402868}
   - component: {fileID: 985402869}
   m_Layer: 0
-  m_Name: Color_2
+  m_Name: ColorPin_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2391,7 +2391,7 @@ GameObject:
   - component: {fileID: 2004852947}
   - component: {fileID: 2004852948}
   m_Layer: 0
-  m_Name: Color_5
+  m_Name: ColorPin_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
