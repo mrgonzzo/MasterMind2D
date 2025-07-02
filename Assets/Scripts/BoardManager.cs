@@ -13,13 +13,13 @@ public class BoardManager : MonoBehaviour
     void Start()
     {
         int[] secretCodeArray  = gameControllerInstance.CodeGenerator(4, 1, 6);
-        masterCodeCoverSwitch();
+        SecretCodeCoverSwitch();
         DrawSecretCode(secretCodeArray);
         // 2 activar Turn_0
-        GameObject currentTurnObjet = GameObject.Find("Turn_"+ turnControllerInstance.currentTurn);        
+        GameObject currentTurnObjet = GameObject.Find("Turn_0");        
         currentTurnObjet.GetComponent<Collider2D>().enabled = true;
-        //currentTurnObjet.SetActive(false);
-}
+        
+    }
 
     // Update is called once per frame
     void Update()
@@ -62,7 +62,7 @@ public class BoardManager : MonoBehaviour
     } //metodo*/
 
 
-    public void masterCodeCoverSwitch()
+    public void SecretCodeCoverSwitch()
     {        
         if (coverGameObjet == null)
         {

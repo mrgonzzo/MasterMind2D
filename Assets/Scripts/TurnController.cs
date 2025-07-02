@@ -11,9 +11,4 @@ public class TurnController : MonoBehaviour
         currentTurn = 0;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
