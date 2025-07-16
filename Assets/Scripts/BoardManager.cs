@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Se encarga de gestionar el tablero de juego: generación del código secreto,
@@ -133,7 +134,7 @@ public class BoardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Maneja la lógica al hacer clic en un ColorPin: guarda el color y pinta la apuesta.
+    /// Maneja la lógica al hacer clic en un ColorPin: guarda el color
     /// </summary>
     private void HandleColorPinClicked(Color color)
     {
@@ -143,67 +144,23 @@ public class BoardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Pinta el CodePin específico dentro del BetCode correspondiente al turno actual.
-    /// Este método se llama desde el evento de clic en un CodePin.
-    /// </summary>
-    /// <param name="clickedPin">Referencia al CodePin que fue clicado por el jugador.</param>
-    /// <summary>
-    /// Pinta el CodePin específico con el color actualmente seleccionado.
-    /// Este método debe ser llamado al clicar un CodePin.
-    /// </summary>
-    /// <param name="codePin">Referencia al CodePin clicado por el jugador.</param>
-    private void PaintCodePin(CodePin codePin)
-    {
-        // Asigna el color seleccionado directamente al CodePin.
-        codePin.SetColor(selectedColor);
-    }
-
-
-
-/// <summary>
-/// Pinta el siguiente CodePin vacío del turno actual con el color seleccionado.
-/// </summary>
-private void PaintNextCodePinInTurn()
-    {
-        // Verifica que el índice del turno actual no se salga del rango de turnos disponibles.
-        if (currentTurnIndex >= betCodeTurns.Count)
-            return;
-
-        // Obtiene el conjunto de pins del turno actual según el índice.
-        Transform currentBetCode = betCodeTurns[currentTurnIndex];
-
-        // Recorre cada pin dentro del conjunto del turno actual.
-        foreach (Transform pin in currentBetCode)
-        {
-            // Intenta obtener el componente SpriteRenderer, que permite modificar el color del pin.
-            SpriteRenderer sr = pin.GetComponent<SpriteRenderer>();
-
-            // Si el componente existe y su color es el definido como "gris inactivo" (es decir, vacío)...
-            if (sr != null && sr.color == Constants.grisInactivo)
-            {
-                // ... entonces pinta el pin con el color actualmente seleccionado por el jugador.
-                sr.color = selectedColor;
-
-                // Y sale del bucle, ya que solo se debe pintar un pin por llamada.
-                break;
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// Método alternativo para manejar clics sobre pines de apuesta específicos (no usado por ahora).
+    /// Método para manejar clics sobre pines de apuesta específicos  y pinta la apuesta..
     /// </summary>
     private void HandleCodePinClicked(CodePin codePin)
     {
         codePin.SetColor(selectedColor);
     }
 
-    /// <summary>
-    /// Avanza al siguiente turno.
-    /// </summary>
-    public void AdvanceTurn()
+    //Control de los botones
+    public void CloseApp()
     {
-        currentTurnIndex++;
+        Application.Quit();
+        Debug.Log("La aplicación se está cerrando...");
+    }
+
+    public void NewGame()
+    {
+        // Recarga la escena actual
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
