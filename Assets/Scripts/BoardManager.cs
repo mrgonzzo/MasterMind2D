@@ -2,82 +2,208 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
+/// <summary>
+/// Se encarga de gestionar el tablero de juego: generación del código secreto,
+/// pintura de pines de apuesta, manejo del turno actual y suscripción a eventos de entrada.
+/// </summary>
 public class BoardManager : MonoBehaviour
 {
-    [SerializeField] private GameObject secretCodeGameObjet;
-    [SerializeField] private GameObject coverGameObjet;
-    public GameController gameControllerInstance;
-    public TurnController turnControllerInstance;
-    // Start is called before the first frame update
+    [Header("Código secreto y su tapa")]
+    [SerializeField] private GameObject secretCodeGameObjet;  // Referencia al GameObject del código secreto
+    [SerializeField] private GameObject coverGameObjet;       // Referencia a la tapa del código secreto
+
+    [Header("Entrada de usuario")]
+    [SerializeField] private MouseInput2DHandler inputHandler; // Referencia al manejador de entrada del mouse
+
+    [Header("Referencias del esquema de color")]
+    [SerializeField] private List<ColorPin> colorPins; // Lista de pines de colores disponibles para elegir
+
+    [Header("BetCode por turno")]
+    [SerializeField] private List<Transform> betCodeTurns; // Lista de contenedores de pines de apuesta (Turn_0, Turn_1, etc.)
+
+    // Referencias a otros controladores del juego
+    [SerializeField] private GameController gameControllerInstance;
+    [SerializeField] private TurnController turnControllerInstance;
+
+    private Color selectedColor = Constants.grisInactivo; // Color seleccionado actual, inicia como inactivo
+    private int currentTurnIndex = 0; // Índice del turno actual (empieza en 0)
+
+    // Start es llamado antes del primer frame
     void Start()
     {
-        int[] secretCodeArray  = gameControllerInstance.CodeGenerator(4, 1, 6);
+        if (gameControllerInstance == null)
+        {
+            gameControllerInstance = UnityEngine.Object.FindFirstObjectByType<GameController>();
+        }
+        // Genera un nuevo código secreto de 4 colores aleatorios
+        int[] secretCodeArray = gameControllerInstance.CodeGenerator(4, 1, 6);
+
+        // Oculta el código secreto al iniciar la partida
         SecretCodeCoverSwitch();
+
+        // Dibuja el código secreto en pantalla (aunque esté oculto visualmente)
         DrawSecretCode(secretCodeArray);
-        // 2 activar Turn_0
-        GameObject currentTurnObjet = GameObject.Find("Turn_0");        
-        currentTurnObjet.GetComponent<Collider2D>().enabled = true;
-        
+
+        // Activa el collider de Turn_0 (para permitir interacción)
+        GameObject currentTurnObjet = GameObject.Find("Turn_0");
+        // Activa todos los colliders de los CodePin dentro del turno actual
+        foreach (Collider2D col in currentTurnObjet.GetComponentsInChildren<Collider2D>())
+        {
+            col.enabled = true;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Update se llama una vez por frame, de momento sin uso
+    void Update() { }
 
+    /// <summary>
+    /// Dibuja el código secreto usando los valores del array recibido.
+    /// </summary>
     public void DrawSecretCode(int[] secretCodeArray)
     {
         Debug.Log("SecretCodeManager secretCodeArray[] = [" + secretCodeArray[0] + "," + secretCodeArray[1] + "," + secretCodeArray[2] + "," + secretCodeArray[3] + "]");
+
         for (int i = 0; i <= 3; i++)
         {
-            // busecretCodemos el hijo de secretCode correspondiente
             Transform codePinTransform = secretCodeGameObjet.transform.Find("CodePin_" + i);
-            // y accedemos a su render
             SpriteRenderer codePinRenderer = codePinTransform.GetComponent<SpriteRenderer>();
-            //traducimos los numero a nuestros colores y pintamos
+
+            // Traduce el número a su color correspondiente y lo pinta
             switch (secretCodeArray[i])
             {
-                case 1: //Verde
+                case 1:
                     codePinRenderer.color = Constants.rojo;
                     break;
-                case 2: //Azul
+                case 2:
                     codePinRenderer.color = Constants.verde;
                     break;
-                case 3: //Rojo
+                case 3:
                     codePinRenderer.color = Constants.azul;
                     break;
-                case 4: //Amarillo
+                case 4:
                     codePinRenderer.color = Constants.amarillo;
                     break;
-                case 5: // morado
+                case 5:
                     codePinRenderer.color = Constants.morado;
                     break;
-                case 6: //Naranja
+                case 6:
                     codePinRenderer.color = Constants.naranja;
                     break;
-            } //switch
-        } //for
-    } //metodo*/
+            }
+        }
+    }
 
-
+    /// <summary>
+    /// Activa o desactiva visualmente la tapa que cubre el código secreto.
+    /// </summary>
     public void SecretCodeCoverSwitch()
-    {        
+    {
         if (coverGameObjet == null)
         {
             Debug.Log("SecretCodeManager error al asignar la tapa");
         }
         else
-        { 
-            // Verifica si el objeto tiene un MeshRenderer
+        {
             SpriteRenderer spriteRenderer = coverGameObjet.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
-                // Desactiva el MeshRenderer (no se "pintará" el objeto)
                 spriteRenderer.enabled = !spriteRenderer.enabled;
             }
         }
     }
 
+    /// <summary>
+    /// Suscripción a eventos cuando el objeto se activa.
+    /// </summary>
+    private void OnEnable()
+    {
+        inputHandler.OnColorPinClicked += HandleColorPinClicked;
+        inputHandler.OnCodePinClicked += HandleCodePinClicked; // Comentado por ahora
+    }
+
+    /// <summary>
+    /// Desuscripción a eventos cuando el objeto se desactiva.
+    /// </summary>
+    private void OnDisable()
+    {
+        inputHandler.OnColorPinClicked -= HandleColorPinClicked;
+        inputHandler.OnCodePinClicked -= HandleCodePinClicked;
+    }
+
+    /// <summary>
+    /// Maneja la lógica al hacer clic en un ColorPin: guarda el color y pinta la apuesta.
+    /// </summary>
+    private void HandleColorPinClicked(Color color)
+    {
+        selectedColor = color;
+        Debug.Log("Color seleccionado: " + selectedColor);
+
+    }
+
+    /// <summary>
+    /// Pinta el CodePin específico dentro del BetCode correspondiente al turno actual.
+    /// Este método se llama desde el evento de clic en un CodePin.
+    /// </summary>
+    /// <param name="clickedPin">Referencia al CodePin que fue clicado por el jugador.</param>
+    /// <summary>
+    /// Pinta el CodePin específico con el color actualmente seleccionado.
+    /// Este método debe ser llamado al clicar un CodePin.
+    /// </summary>
+    /// <param name="codePin">Referencia al CodePin clicado por el jugador.</param>
+    private void PaintCodePin(CodePin codePin)
+    {
+        // Asigna el color seleccionado directamente al CodePin.
+        codePin.SetColor(selectedColor);
+    }
+
+
+
+/// <summary>
+/// Pinta el siguiente CodePin vacío del turno actual con el color seleccionado.
+/// </summary>
+private void PaintNextCodePinInTurn()
+    {
+        // Verifica que el índice del turno actual no se salga del rango de turnos disponibles.
+        if (currentTurnIndex >= betCodeTurns.Count)
+            return;
+
+        // Obtiene el conjunto de pins del turno actual según el índice.
+        Transform currentBetCode = betCodeTurns[currentTurnIndex];
+
+        // Recorre cada pin dentro del conjunto del turno actual.
+        foreach (Transform pin in currentBetCode)
+        {
+            // Intenta obtener el componente SpriteRenderer, que permite modificar el color del pin.
+            SpriteRenderer sr = pin.GetComponent<SpriteRenderer>();
+
+            // Si el componente existe y su color es el definido como "gris inactivo" (es decir, vacío)...
+            if (sr != null && sr.color == Constants.grisInactivo)
+            {
+                // ... entonces pinta el pin con el color actualmente seleccionado por el jugador.
+                sr.color = selectedColor;
+
+                // Y sale del bucle, ya que solo se debe pintar un pin por llamada.
+                break;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Método alternativo para manejar clics sobre pines de apuesta específicos (no usado por ahora).
+    /// </summary>
+    private void HandleCodePinClicked(CodePin codePin)
+    {
+        codePin.SetColor(selectedColor);
+    }
+
+    /// <summary>
+    /// Avanza al siguiente turno.
+    /// </summary>
+    public void AdvanceTurn()
+    {
+        currentTurnIndex++;
+    }
 }
