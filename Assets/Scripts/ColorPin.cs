@@ -6,11 +6,12 @@ using UnityEngine;
 /// </summary>
 public class ColorPin : MonoBehaviour
 {
-    // Color asignado a este pin
+    // Color y colorCode asignado a este pin
     private Color color;
-
+    private int colorCode;
     // Propiedad pública para acceder al color desde otros scripts
     public Color PinColor => color;
+    public int ColorCode => colorCode;
 
     /// <summary>
     /// Se llama automáticamente al iniciar el objeto. Asigna el color correspondiente.
@@ -39,6 +40,8 @@ public class ColorPin : MonoBehaviour
             {
                 // Asigna el color correspondiente al índice
                 color = ObtenerColorPorIndice(index);
+                colorCode = index;
+                Debug.Log($"ColorCode = {colorCode}");
                 return;
             }
         }

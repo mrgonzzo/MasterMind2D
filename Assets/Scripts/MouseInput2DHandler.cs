@@ -15,7 +15,7 @@ public class MouseInput2DHandler : MonoBehaviour
     // Componente AudioSource para reproducir sonidos
     private AudioSource audioSource;
 
-    public event Action<Color> OnColorPinClicked;
+    public event Action<Color, int> OnColorPinClicked;
     public event Action<CodePin> OnCodePinClicked;
 
     void Awake()
@@ -43,7 +43,7 @@ public class MouseInput2DHandler : MonoBehaviour
                 if (clickedObject.TryGetComponent<ColorPin>(out var colorPin))
                 {
                     Debug.Log("ColorPin detectado. Color: " + colorPin.PinColor);
-                    OnColorPinClicked?.Invoke(colorPin.PinColor);
+                    OnColorPinClicked?.Invoke(colorPin.PinColor, colorPin.ColorCode);
                     PlayClickSound(); // 🔊 sonido
                 }
                 // Si es un CodePin

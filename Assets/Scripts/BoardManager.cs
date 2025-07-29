@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
@@ -6,14 +6,14 @@ using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Se encarga de gestionar el tablero de juego: generaciÛn del cÛdigo secreto,
-/// pintura de pines de apuesta, manejo del turno actual y suscripciÛn a eventos de entrada.
+/// Se encarga de gestionar el tablero de juego: generaci√≥n del c√≥digo secreto,
+/// pintura de pines de apuesta, manejo del turno actual y suscripci√≥n a eventos de entrada.
 /// </summary>
 public class BoardManager : MonoBehaviour
 {
-    [Header("CÛdigo secreto y su tapa")]
-    [SerializeField] private GameObject secretCodeGameObjet;  // Referencia al GameObject del cÛdigo secreto
-    [SerializeField] private GameObject coverGameObjet;       // Referencia a la tapa del cÛdigo secreto
+    [Header("C√≥digo secreto y su tapa")]
+    [SerializeField] private GameObject secretCodeGameObjet;  // Referencia al GameObject del c√≥digo secreto
+    [SerializeField] private GameObject coverGameObjet;       // Referencia a la tapa del c√≥digo secreto
 
     [Header("Entrada de usuario")]
     [SerializeField] private MouseInput2DHandler inputHandler; // Referencia al manejador de entrada del mouse
@@ -21,58 +21,64 @@ public class BoardManager : MonoBehaviour
     [Header("Referencias del esquema de color")]
     [SerializeField] private List<ColorPin> colorPins; // Lista de pines de colores disponibles para elegir
 
-    [Header("BetCode por turno")]
-    [SerializeField] private List<Transform> betCodeTurns; // Lista de contenedores de pines de apuesta (Turn_0, Turn_1, etc.)
-
+    [Header("betTurns por turno")]
+    [SerializeField] private List<Transform> betTurns; // Lista de contenedores de pines de apuesta (Turn_0, Turn_1, etc.)
+    [SerializeField] private int maxTurns = 9;
+    private int currentTurnIndex = 0;
     // Referencias a otros controladores del juego
     [SerializeField] private GameController gameControllerInstance;
     [SerializeField] private TurnController turnControllerInstance;
 
     private Color selectedColor = Constants.grisInactivo; // Color seleccionado actual, inicia como inactivo
-    private int currentTurnIndex = 0; // Õndice del turno actual (empieza en 0)
 
+    private int selectedColorCode;
+    int[] secretCode;
     // Start es llamado antes del primer frame
     void Start()
     {
         if (gameControllerInstance == null)
         {
             gameControllerInstance = UnityEngine.Object.FindFirstObjectByType<GameController>();
+            secretCode = gameControllerInstance.GetSecretCode();
         }
-        // Genera un nuevo cÛdigo secreto de 4 colores aleatorios
-        int[] secretCodeArray = gameControllerInstance.CodeGenerator(4, 1, 6);
+        else {
+            secretCode = gameControllerInstance.GetSecretCode();
+        }
 
-        // Oculta el cÛdigo secreto al iniciar la partida
-        SecretCodeCoverSwitch();
+            // Oculta el c√≥digo secreto al iniciar la partida
+            SecretCodeCoverSwitch();       
 
-        // Dibuja el cÛdigo secreto en pantalla (aunque estÈ oculto visualmente)
-        DrawSecretCode(secretCodeArray);
+        // Dibuja el c√≥digo secreto en pantalla (aunque est√© oculto visualmente)
+        DrawSecretCode(secretCode);
 
-        // Activa el collider de Turn_0 (para permitir interacciÛn)
+        // Activa el collider de Turn_0 (para permitir interacci√≥n)
         GameObject currentTurnObjet = GameObject.Find("Turn_0");
         // Activa todos los colliders de los CodePin dentro del turno actual
         foreach (Collider2D col in currentTurnObjet.GetComponentsInChildren<Collider2D>())
         {
             col.enabled = true;
         }
+
+        ValidateSetup();
     }
+
+
 
     // Update se llama una vez por frame, de momento sin uso
     void Update() { }
 
     /// <summary>
-    /// Dibuja el cÛdigo secreto usando los valores del array recibido.
+    /// Dibuja el c√≥digo secreto usando los valores del array recibido.
     /// </summary>
-    public void DrawSecretCode(int[] secretCodeArray)
+    public void DrawSecretCode(int[] secretCode)
     {
-        Debug.Log("SecretCodeManager secretCodeArray[] = [" + secretCodeArray[0] + "," + secretCodeArray[1] + "," + secretCodeArray[2] + "," + secretCodeArray[3] + "]");
-
         for (int i = 0; i <= 3; i++)
         {
             Transform codePinTransform = secretCodeGameObjet.transform.Find("CodePin_" + i);
             SpriteRenderer codePinRenderer = codePinTransform.GetComponent<SpriteRenderer>();
 
-            // Traduce el n˙mero a su color correspondiente y lo pinta
-            switch (secretCodeArray[i])
+            // Traduce el n√∫mero a su color correspondiente y lo pinta
+            switch (secretCode[i])
             {
                 case 1:
                     codePinRenderer.color = Constants.rojo;
@@ -97,7 +103,7 @@ public class BoardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Activa o desactiva visualmente la tapa que cubre el cÛdigo secreto.
+    /// Activa o desactiva visualmente la tapa que cubre el c√≥digo secreto.
     /// </summary>
     public void SecretCodeCoverSwitch()
     {
@@ -116,7 +122,7 @@ public class BoardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// SuscripciÛn a eventos cuando el objeto se activa.
+    /// Suscripci√≥n a eventos cuando el objeto se activa.
     /// </summary>
     private void OnEnable()
     {
@@ -125,7 +131,7 @@ public class BoardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// DesuscripciÛn a eventos cuando el objeto se desactiva.
+    /// Desuscripci√≥n a eventos cuando el objeto se desactiva.
     /// </summary>
     private void OnDisable()
     {
@@ -134,33 +140,193 @@ public class BoardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Maneja la lÛgica al hacer clic en un ColorPin: guarda el color
+    /// Maneja la l√≥gica al hacer clic en un ColorPin: guarda el color
     /// </summary>
-    private void HandleColorPinClicked(Color color)
+    private void HandleColorPinClicked(Color color, int code)
     {
         selectedColor = color;
-        Debug.Log("Color seleccionado: " + selectedColor);
-
+        selectedColorCode = code;
     }
 
     /// <summary>
-    /// MÈtodo para manejar clics sobre pines de apuesta especÌficos  y pinta la apuesta..
+    /// M√©todo para manejar clics sobre pines de apuesta espec√≠ficos  y pinta la apuesta..
     /// </summary>
     private void HandleCodePinClicked(CodePin codePin)
     {
-        codePin.SetColor(selectedColor);
+        codePin.SetColor(selectedColor, selectedColorCode);
     }
 
-    //Control de los botones
-    public void CloseApp()
+    public void EndCurrentTurnAndActivateNext()
     {
-        Application.Quit();
-        Debug.Log("La aplicaciÛn se est· cerrando...");
+        if (betTurns == null || betTurns.Count == 0) return;
+
+        if (currentTurnIndex >= maxTurns)
+        {
+            Debug.Log("Ya no hay m√°s turnos disponibles.");
+            // EndOfGame()
+            return;
+        }
+
+        // 1. Bloquear turno actual
+        Transform turnoActual = betTurns[currentTurnIndex];
+        foreach (Collider2D col in turnoActual.GetComponentsInChildren<Collider2D>())
+        {
+            col.enabled = false;
+        }
+
+        // 2. Avanzar turno
+        currentTurnIndex++;
+
+        // 3. Activar siguiente turno si no hemos llegado al l√≠mite
+        if (currentTurnIndex < maxTurns)
+        {
+            Transform siguienteTurno = betTurns[currentTurnIndex];
+            foreach (Collider2D col in siguienteTurno.GetComponentsInChildren<Collider2D>())
+            {
+                col.enabled = true;
+            }
+        }
+        else
+        {
+            Debug.Log(" Se completaron todos los turnos.");
+            // EndOfGame()
+            // Aqu√≠ se puede desactivar bot√≥n o notificar al GameController
+        }
     }
 
-    public void NewGame()
+    public int[] GetCurrentBetCode()
     {
-        // Recarga la escena actual
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        int[] betCode = new int[4];
+
+        Transform currentBetCode = betTurns[currentTurnIndex].Find("BetCode_"+ currentTurnIndex);
+
+        for (int i = 0; i < 4; i++)
+        {
+            var pin = currentBetCode.Find("CodePin_" + i);
+            var codePin = pin.GetComponent<CodePin>();
+            if (codePin != null)
+            {
+                betCode[i] = codePin.GetColorCode();
+            }
+            else
+            {
+                betCode[i] = 0;
+            }
+        }
+
+        return betCode;
     }
+
+    /// <summary>
+    /// Pinta los pines de respuesta (negros y blancos) en el turno actual.
+    /// </summary>
+    public void DrawResponse(int blackPins, int whitePins)
+    {
+        Transform turnoActual = betTurns[currentTurnIndex];
+        Transform respuestaActual = turnoActual.Find("Response_" + currentTurnIndex);
+
+        if (respuestaActual == null)
+        {
+            Debug.LogError($"No se encontr√≥ Response_{currentTurnIndex} en {turnoActual.name}");
+            return;
+        }
+
+        int index = 0;
+
+        for (int i = 0; i < blackPins; i++)
+        {
+            SpriteRenderer sr = respuestaActual.Find("ResponsePin_" + index)?.GetComponent<SpriteRenderer>();
+            if (sr != null)
+                sr.color = Constants.negro;
+            index++;
+        }
+
+        for (int i = 0; i < whitePins; i++)
+        {
+            SpriteRenderer sr = respuestaActual.Find("ResponsePin_" + index)?.GetComponent<SpriteRenderer>();
+            if (sr != null)
+                sr.color = Constants.blanco;
+            index++;
+        }
+    }
+
+
+
+
+    private void ValidateSetup()
+    {
+        Debug.Log("Validando estructura del tablero...");
+
+        if (gameControllerInstance == null) Debug.LogError("GameController no asignado");
+        if (turnControllerInstance == null) Debug.LogError("TurnController no asignado");
+        if (secretCodeGameObjet == null) Debug.LogError("secretCodeGameObjet no asignado");
+        if (coverGameObjet == null) Debug.LogError("coverGameObjet no asignado");
+
+        if (colorPins == null || colorPins.Count == 0)
+            Debug.LogError("Lista de ColorPins vac√≠a o no asignada");
+
+        if (betTurns == null || betTurns.Count == 0)
+        {
+            Debug.LogError("Lista de betTurns vac√≠a o no asignada");
+            return;
+        }
+
+        for (int t = 0; t < betTurns.Count; t++)
+        {
+            Transform turno = betTurns[t];
+            if (turno == null)
+            {
+                Debug.LogError($"Turno {t} es null");
+                continue;
+            }
+
+            // üî∏ BetCode_X
+            Transform apuesta = turno.Find("BetCode_" + t);
+            if (apuesta == null)
+            {
+                Debug.LogError($"No se encontr√≥ BetCode_{t} en Turn_{t}");
+            }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    Transform pin = apuesta.Find("CodePin_" + i);
+                    if (pin == null)
+                    {
+                        Debug.LogError($"Faltante: CodePin_{i} en BetCode_{t}");
+                    }
+                    else if (pin.GetComponent<SpriteRenderer>() == null)
+                    {
+                        Debug.LogError($"CodePin_{i} en BetCode_{t} no tiene SpriteRenderer");
+                    }
+                }
+            }
+
+            // üî∏ Response_X
+            Transform respuesta = turno.Find("Response_" + t);
+            if (respuesta == null)
+            {
+                Debug.LogError($"Faltante: contenedor Response_{t} en Turn_{t}");
+            }
+            else
+            {
+                for (int r = 0; r < 4; r++)
+                {
+                    Transform pin = respuesta.Find("ResponsePin_" + r);
+                    if (pin == null)
+                    {
+                        Debug.LogError($"Faltante: ResponsePin_{r} en Response_{t}");
+                    }
+                    else if (pin.GetComponent<SpriteRenderer>() == null)
+                    {
+                        Debug.LogError($"ResponsePin_{r} en Response_{t} no tiene SpriteRenderer");
+                    }
+                }
+            }
+        }
+
+        Debug.Log("Validaci√≥n completada.");
+    }
+
+
 }

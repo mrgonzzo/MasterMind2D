@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    int currentTurn;
 
+    private int[] secretCodeArray;
+    int currentTurn;
+    [SerializeField] private BoardManager boardManagerinstance;
+    [SerializeField] private TurnController turnControllerInstance;
     // Start is called before the first frame update
     void Start()
     {
-        
+        // Genera un nuevo código secreto de 4 colores aleatorios
+        secretCodeArray = CodeGenerator(4, 1, 6);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public int[] CodeGenerator(int length, int minValue, int maxValue)
     {
         int[] array = new int[length];
@@ -26,4 +25,10 @@ public class GameController : MonoBehaviour
         }
         return array;
     }
+
+    public int[] GetSecretCode()
+    {
+        return secretCodeArray;
+    }
+
 }
