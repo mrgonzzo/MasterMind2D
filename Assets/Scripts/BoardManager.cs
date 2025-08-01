@@ -23,7 +23,7 @@ public class BoardManager : MonoBehaviour
 
     [Header("betTurns por turno")]
     [SerializeField] private List<Transform> betTurns; // Lista de contenedores de pines de apuesta (Turn_0, Turn_1, etc.)
-    [SerializeField] private int maxTurns = 9;
+    [SerializeField] public int maxTurnsSelected;
     private int currentTurnIndex = 0;
     // Referencias a otros controladores del juego
     [SerializeField] private GameController gameControllerInstance;
@@ -36,6 +36,7 @@ public class BoardManager : MonoBehaviour
     // Start es llamado antes del primer frame
     void Start()
     {
+
         if (gameControllerInstance == null)
         {
             gameControllerInstance = UnityEngine.Object.FindFirstObjectByType<GameController>();
@@ -160,13 +161,6 @@ public class BoardManager : MonoBehaviour
     {
         if (betTurns == null || betTurns.Count == 0) return;
 
-        if (currentTurnIndex >= maxTurns)
-        {
-            Debug.Log("Ya no hay más turnos disponibles.");
-            // EndOfGame()
-            return;
-        }
-
         // 1. Bloquear turno actual
         Transform turnoActual = betTurns[currentTurnIndex];
         foreach (Collider2D col in turnoActual.GetComponentsInChildren<Collider2D>())
@@ -178,7 +172,7 @@ public class BoardManager : MonoBehaviour
         currentTurnIndex++;
 
         // 3. Activar siguiente turno si no hemos llegado al límite
-        if (currentTurnIndex < maxTurns)
+        if (currentTurnIndex < maxTurnsSelected)
         {
             Transform siguienteTurno = betTurns[currentTurnIndex];
             foreach (Collider2D col in siguienteTurno.GetComponentsInChildren<Collider2D>())
@@ -189,7 +183,7 @@ public class BoardManager : MonoBehaviour
         else
         {
             Debug.Log(" Se completaron todos los turnos.");
-            // EndOfGame()
+           
             // Aquí se puede desactivar botón o notificar al GameController
         }
     }
@@ -198,7 +192,7 @@ public class BoardManager : MonoBehaviour
     {
         int[] betCode = new int[4];
 
-        Transform currentBetCode = betTurns[currentTurnIndex].Find("BetCode_"+ currentTurnIndex);
+        Transform currentBetCode = betTurns[currentTurnIndex].Find("BetCode_" + currentTurnIndex);
 
         for (int i = 0; i < 4; i++)
         {
@@ -250,6 +244,10 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    public int GetMaxTurn()
+    {
+        return maxTurnsSelected;
+    }
 
 
 
@@ -280,7 +278,7 @@ public class BoardManager : MonoBehaviour
                 continue;
             }
 
-            // 🔸 BetCode_X
+            //  BetCode_X
             Transform apuesta = turno.Find("BetCode_" + t);
             if (apuesta == null)
             {
@@ -302,7 +300,7 @@ public class BoardManager : MonoBehaviour
                 }
             }
 
-            // 🔸 Response_X
+            // Response_X
             Transform respuesta = turno.Find("Response_" + t);
             if (respuesta == null)
             {

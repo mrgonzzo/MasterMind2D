@@ -7,7 +7,7 @@ public class TurnController : MonoBehaviour
     [SerializeField] private GameController gameControllerInstance;
     [SerializeField] private BoardManager boardManagerInstance;
     
-    public int currentTurn;
+    public int currentTurnIndex;
 
     // Start is called before the first frame update
     void Start()
@@ -24,8 +24,8 @@ public class TurnController : MonoBehaviour
     }
     /// <summary>
     /// Compara la apuesta del jugador con el código secreto y devuelve cuántos pines negros y blancos hay.
-    /// 🔴 Negro = color y posición correctos.
-    /// ⚪ Blanco = color correcto, pero posición incorrecta.
+    /// Negro = color y posición correctos.
+    /// Blanco = color correcto, pero posición incorrecta.
     /// </summary>
     public (int blackPins, int whitePins) EvaluarApuesta(int[] apuesta, int[] codigoSecreto)
     {
@@ -39,7 +39,7 @@ public class TurnController : MonoBehaviour
         bool[] usadoEnApuesta = new bool[length];
         bool[] usadoEnSecreto = new bool[length];
 
-        // 🔴 Paso 1: contar coincidencias exactas (negros)
+        // Paso 1: contar coincidencias exactas (negros)
         for (int i = 0; i < length; i++)
         {
             if (apuesta[i] == codigoSecreto[i])
@@ -50,7 +50,7 @@ public class TurnController : MonoBehaviour
             }
         }
 
-        // ⚪ Paso 2: buscar coincidencias de color en distinta posición (blancos)
+        // Paso 2: buscar coincidencias de color en distinta posición (blancos)
         for (int i = 0; i < length; i++)
         {
             if (usadoEnApuesta[i]) continue; // ya fue contado como negro
@@ -81,5 +81,9 @@ public class TurnController : MonoBehaviour
 
         return EvaluarApuesta(apuesta, secreto);
     }
+	public bool IsLastTurnPlayed()
+	{
+        return currentTurnIndex >= boardManagerInstance.GetMaxTurn();
+	}
 
 }

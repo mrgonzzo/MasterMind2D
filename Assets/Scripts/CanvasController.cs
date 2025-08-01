@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class CanvasController : MonoBehaviour
 {
     [SerializeField] private BoardManager boardManagerInstance;
-    [SerializeField] private TurnController turnControllerInstance;
+    [SerializeField] private GameController gameControllerInstance;
 
     void Start() 
     {
@@ -15,9 +15,9 @@ public class CanvasController : MonoBehaviour
             boardManagerInstance = UnityEngine.Object.FindFirstObjectByType<BoardManager>();
         }
 
-        if (turnControllerInstance == null)
+        if (gameControllerInstance == null)
         {
-            turnControllerInstance = UnityEngine.Object.FindFirstObjectByType<TurnController>();
+            gameControllerInstance = UnityEngine.Object.FindFirstObjectByType<GameController>();
         }
     }
     //Control de los botones
@@ -33,15 +33,9 @@ public class CanvasController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public void PlayTurn() 
+    public void OnPlayTurnButtonPressed()
     {
-        Debug.Log($"PlayTurn()");
-
-        int[] apuesta = boardManagerInstance.GetCurrentBetCode();
-
-        Debug.Log($"GetCurrentBetCode() obtenido");
-        (int negros, int blancos) = turnControllerInstance.SubmitTurn(apuesta);
-        boardManagerInstance.DrawResponse(negros, blancos);
-        boardManagerInstance.EndCurrentTurnAndActivateNext();
+        gameControllerInstance.PlayTurnRequest();
     }
+
 }

@@ -631,9 +631,9 @@ Transform:
   m_LocalScale: {x: 12, y: 12, z: 6}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 2060352682}
   - {fileID: 1637866134}
   - {fileID: 1550224398}
+  - {fileID: 2060352682}
   - {fileID: 519420032}
   - {fileID: 1205799874}
   - {fileID: 888090244}
@@ -680,7 +680,7 @@ MonoBehaviour:
   - {fileID: 942355516}
   - {fileID: 357826642}
   - {fileID: 888090244}
-  maxTurns: 9
+  maxTurnsSelected: 9
   gameControllerInstance: {fileID: 1637866133}
   turnControllerInstance: {fileID: 1550224397}
 --- !u!1 &351052021
@@ -2312,7 +2312,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2060352683}
         m_TargetAssemblyTypeName: CanvasController, Assembly-CSharp
-        m_MethodName: PlayTurn
+        m_MethodName: OnPlayTurnButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2394,9 +2394,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b5afea8816b8374e9733803e2cd6039, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameControllerInstance: {fileID: 0}
-  boardManagerInstance: {fileID: 0}
-  currentTurn: 0
+  gameControllerInstance: {fileID: 1637866133}
+  boardManagerInstance: {fileID: 228363841}
+  currentTurnIndex: 0
 --- !u!4 &1550224398
 Transform:
   m_ObjectHideFlags: 0
@@ -2596,8 +2596,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716cc66dd8863304b89b172f07e2b85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardManagerinstance: {fileID: 0}
-  turnControllerInstance: {fileID: 0}
+  boardManagerInstance: {fileID: 228363841}
+  turnControllerInstance: {fileID: 1550224397}
+  maxTurns: 9
 --- !u!4 &1637866134
 Transform:
   m_ObjectHideFlags: 0
@@ -2784,7 +2785,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Play turn
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2811,8 +2812,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 72
+  m_fontSizeBase: 72
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3171,7 +3172,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 292, y: 537}
+  m_AnchoredPosition: {x: 305, y: 537}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2029787835
@@ -3195,8 +3196,8 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0, g: 1, b: 0.116532326, a: 1}
-    m_HighlightedColor: {r: 0.4669811, g: 1, b: 0.50623244, a: 1}
+    m_NormalColor: {r: 0.41709685, g: 0.8584906, b: 0.46902558, a: 1}
+    m_HighlightedColor: {r: 0.3730865, g: 0.6037736, b: 0.39004883, a: 1}
     m_PressedColor: {r: 0.5566038, g: 0.5566038, b: 0.5566038, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -3294,7 +3295,7 @@ Transform:
   m_GameObject: {fileID: 2033616789}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10, y: 30.567049, z: 0.47343603}
+  m_LocalPosition: {x: 8.7, y: 30.567049, z: 0.47343603}
   m_LocalScale: {x: 32, y: 8, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3390,7 +3391,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -282, y: 544}
+  m_AnchoredPosition: {x: -298, y: 544}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2040003609
@@ -3414,8 +3415,8 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.9528302, g: 0.06741722, b: 0.23870668, a: 1}
-    m_HighlightedColor: {r: 1, g: 0.6367924, b: 0.6367924, a: 1}
+    m_NormalColor: {r: 0.6792453, g: 0.47098613, b: 0.5115321, a: 1}
+    m_HighlightedColor: {r: 0.5377358, g: 0.4185208, b: 0.4185208, a: 1}
     m_PressedColor: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -3740,8 +3741,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0307b3b9c36c54f84b942c3617940a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardManagerInstance: {fileID: 0}
-  turnControllerInstance: {fileID: 0}
+  boardManagerInstance: {fileID: 228363841}
+  gameControllerInstance: {fileID: 1637866133}
 --- !u!21 &2137857965
 Material:
   serializedVersion: 8
