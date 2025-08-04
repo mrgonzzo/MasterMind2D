@@ -85,45 +85,40 @@ public class GameController : MonoBehaviour
 		// Verificar condición de victoria
 		if (negros == 4)
 		{
-			Debug.Log("Victoria: el jugador ha adivinado el código secreto.");
-			EndGame(true);
+            boardManagerInstance.SecretCodeCoverSwitch();
+            Debug.Log("Victoria: el jugador ha adivinado el código secreto.");
+			
 			return;
 		}
 
 		// Avanzar turno en el tablero
 		boardManagerInstance.EndCurrentTurnAndActivateNext();
-		currentTurn++;
+
 
 		// Verificar condición de derrota (sin más turnos disponibles)
 		if (currentTurn >= maxTurns)
 		{
+			boardManagerInstance.SecretCodeCoverSwitch();
 			Debug.Log("Derrota: el jugador ha agotado todos los turnos.");
-			EndGame(false);
+
 		}
+		else 
+		{
+			currentTurn++;
+
+        }
+
 	}
 
 	/// <summary>
 	/// Finaliza la partida, mostrando el resultado final.
 	/// </summary>
 	/// <param name="victoria">True si se ganó la partida, False si se perdió</param>
-	private void EndGame(bool victoria)
-	{
-		//descubrimos el codigo secreto
-		boardManagerInstance.SecretCodeCoverSwitch();
-
-		if (victoria)
-		{
 			
-			Debug.Log("Fin de partida: Victoria");
-		}
-		else
-		{
-			Debug.Log("Fin de partida: Derrota");
-		}
 
 		// Aquí se puede implementar: desactivar botones, mostrar UI final, cargar escena, etc.
 		// Ejemplo:
 		// UIController.Instance.ShowEndGameScreen(victoria);
 		// SceneManager.LoadScene("PantallaFinal");
-	}
+	
 }

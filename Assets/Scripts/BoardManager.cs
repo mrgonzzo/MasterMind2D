@@ -60,7 +60,7 @@ public class BoardManager : MonoBehaviour
             col.enabled = true;
         }
 
-        ValidateSetup();
+      //  ValidateSetup();
     }
 
 
@@ -181,6 +181,7 @@ public class BoardManager : MonoBehaviour
             }
         }
         else
+
         {
             Debug.Log(" Se completaron todos los turnos.");
            
@@ -251,7 +252,7 @@ public class BoardManager : MonoBehaviour
 
 
 
-    private void ValidateSetup()
+  /*  private void ValidateSetup()
     {
         Debug.Log("Validando estructura del tablero...");
 
@@ -324,7 +325,7 @@ public class BoardManager : MonoBehaviour
         }
 
         Debug.Log("Validación completada.");
-    }
+    }*/
 
 
 }
