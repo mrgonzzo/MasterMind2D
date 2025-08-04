@@ -29,8 +29,15 @@ public class CanvasController : MonoBehaviour
 
     public void NewGame()
     {
-        // Recarga la escena actual reiniciando así lla partida
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+        else {
+            // Recarga la escena de juego reiniciando así lla partida
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
     }
 
     public void OnPlayTurnButtonPressed()
