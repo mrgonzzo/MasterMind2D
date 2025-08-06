@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
 	/// <summary>
 	/// Índice del turno actual.
 	/// </summary>
-	private int currentTurn = 0;
+	public int currentTurnIndex = 0;
 
 	/// <summary>
 	/// Número máximo de turnos permitidos en la partida.
@@ -86,39 +86,29 @@ public class GameController : MonoBehaviour
 		if (negros == 4)
 		{
             boardManagerInstance.SecretCodeCoverSwitch();
-            Debug.Log("Victoria: el jugador ha adivinado el código secreto.");
-			
-			return;
+            EndGameVictory(true);
+            return;
 		}
-
-		// Avanzar turno en el tablero
-		boardManagerInstance.EndCurrentTurnAndActivateNext();
-
-
-		// Verificar condición de derrota (sin más turnos disponibles)
-		if (currentTurn >= maxTurns)
-		{
-			boardManagerInstance.SecretCodeCoverSwitch();
-			Debug.Log("Derrota: el jugador ha agotado todos los turnos.");
-
-		}
-		else 
-		{
-			currentTurn++;
-
-        }
+        // Avanzar turno en el turncontroller
+        turnControllerInstance.EndCurrentTurnAndActivateNext();
 
 	}
 
-	/// <summary>
-	/// Finaliza la partida, mostrando el resultado final.
-	/// </summary>
-	/// <param name="victoria">True si se ganó la partida, False si se perdió</param>
-			
+    /// <summary>
+    /// Finaliza la partida, mostrando el resultado final.
+    /// </summary>
+    /// <param name="victoria">True si se ganó la partida, False si se perdió</param>
+    public void EndGameVictory(bool victory)
+    {
+        boardManagerInstance.ShowEndGameAnimation(victory);
+    }
 
-		// Aquí se puede implementar: desactivar botones, mostrar UI final, cargar escena, etc.
-		// Ejemplo:
-		// UIController.Instance.ShowEndGameScreen(victoria);
-		// SceneManager.LoadScene("PantallaFinal");
-	
+
+
+
+    // Aquí se puede implementar: desactivar botones, mostrar UI final, cargar escena, etc.
+    // Ejemplo:
+    // UIController.Instance.ShowEndGameScreen(victoria);
+    // SceneManager.LoadScene("PantallaFinal");
+
 }

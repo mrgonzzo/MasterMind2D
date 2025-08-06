@@ -41,7 +41,6 @@ public class ColorPin : MonoBehaviour
                 // Asigna el color correspondiente al índice
                 color = ObtenerColorPorIndice(index);
                 colorCode = index;
-                Debug.Log($"ColorCode = {colorCode}");
                 return;
             }
         }

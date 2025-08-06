@@ -22,12 +22,14 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private List<ColorPin> colorPins; // Lista de pines de colores disponibles para elegir
 
     [Header("betTurns por turno")]
-    [SerializeField] private List<Transform> betTurns; // Lista de contenedores de pines de apuesta (Turn_0, Turn_1, etc.)
+    [SerializeField] public List<Transform> betTurns; // Lista de contenedores de pines de apuesta (Turn_0, Turn_1, etc.)
     [SerializeField] public int maxTurnsSelected;
-    private int currentTurnIndex = 0;
     // Referencias a otros controladores del juego
     [SerializeField] private GameController gameControllerInstance;
     [SerializeField] private TurnController turnControllerInstance;
+
+    [SerializeField] private Animator endGameAnimator;
+    [SerializeField] private float restartDelay = 4f;
 
     private Color selectedColor = Constants.grisInactivo; // Color seleccionado actual, inicia como inactivo
 
@@ -36,7 +38,7 @@ public class BoardManager : MonoBehaviour
     // Start es llamado antes del primer frame
     void Start()
     {
-
+        
         if (gameControllerInstance == null)
         {
             gameControllerInstance = UnityEngine.Object.FindFirstObjectByType<GameController>();
@@ -157,43 +159,12 @@ public class BoardManager : MonoBehaviour
         codePin.SetColor(selectedColor, selectedColorCode);
     }
 
-    public void EndCurrentTurnAndActivateNext()
-    {
-        if (betTurns == null || betTurns.Count == 0) return;
-
-        // 1. Bloquear turno actual
-        Transform turnoActual = betTurns[currentTurnIndex];
-        foreach (Collider2D col in turnoActual.GetComponentsInChildren<Collider2D>())
-        {
-            col.enabled = false;
-        }
-
-        // 2. Avanzar turno
-        currentTurnIndex++;
-
-        // 3. Activar siguiente turno si no hemos llegado al límite
-        if (currentTurnIndex < maxTurnsSelected)
-        {
-            Transform siguienteTurno = betTurns[currentTurnIndex];
-            foreach (Collider2D col in siguienteTurno.GetComponentsInChildren<Collider2D>())
-            {
-                col.enabled = true;
-            }
-        }
-        else
-
-        {
-            Debug.Log(" Se completaron todos los turnos.");
-           
-            // Aquí se puede desactivar botón o notificar al GameController
-        }
-    }
-
+    
     public int[] GetCurrentBetCode()
     {
         int[] betCode = new int[4];
 
-        Transform currentBetCode = betTurns[currentTurnIndex].Find("BetCode_" + currentTurnIndex);
+        Transform currentBetCode = betTurns[gameControllerInstance.currentTurnIndex].Find("BetCode_" + gameControllerInstance.currentTurnIndex);
 
         for (int i = 0; i < 4; i++)
         {
@@ -217,12 +188,12 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     public void DrawResponse(int blackPins, int whitePins)
     {
-        Transform turnoActual = betTurns[currentTurnIndex];
-        Transform respuestaActual = turnoActual.Find("Response_" + currentTurnIndex);
+        Transform turnoActual = betTurns[gameControllerInstance.currentTurnIndex];
+        Transform respuestaActual = turnoActual.Find("Response_" + gameControllerInstance.currentTurnIndex);
 
         if (respuestaActual == null)
         {
-            Debug.LogError($"No se encontró Response_{currentTurnIndex} en {turnoActual.name}");
+            Debug.LogError($"No se encontró Response_{gameControllerInstance.currentTurnIndex} en {turnoActual.name}");
             return;
         }
 
@@ -250,82 +221,113 @@ public class BoardManager : MonoBehaviour
         return maxTurnsSelected;
     }
 
-
-
-  /*  private void ValidateSetup()
+    public void SwitchBetTurn(bool state) 
     {
-        Debug.Log("Validando estructura del tablero...");
-
-        if (gameControllerInstance == null) Debug.LogError("GameController no asignado");
-        if (turnControllerInstance == null) Debug.LogError("TurnController no asignado");
-        if (secretCodeGameObjet == null) Debug.LogError("secretCodeGameObjet no asignado");
-        if (coverGameObjet == null) Debug.LogError("coverGameObjet no asignado");
-
-        if (colorPins == null || colorPins.Count == 0)
-            Debug.LogError("Lista de ColorPins vacía o no asignada");
-
-        if (betTurns == null || betTurns.Count == 0)
+        Transform turnoActual = betTurns[gameControllerInstance.currentTurnIndex];
+        Transform ApuestaActual = turnoActual.Find("BetCode_" + gameControllerInstance.currentTurnIndex);
+        foreach (Collider2D col in ApuestaActual.GetComponentsInChildren<Collider2D>())
         {
-            Debug.LogError("Lista de betTurns vacía o no asignada");
+            col.enabled = state;
+        }
+    }
+
+    public void ShowEndGameAnimation(bool victory) 
+    {
+        if (endGameAnimator == null)
+        {
+            Debug.LogWarning("No se asignó el Animator para el fin de partida.");
             return;
         }
 
-        for (int t = 0; t < betTurns.Count; t++)
+        if (victory)
         {
-            Transform turno = betTurns[t];
-            if (turno == null)
-            {
-                Debug.LogError($"Turno {t} es null");
-                continue;
-            }
-
-            //  BetCode_X
-            Transform apuesta = turno.Find("BetCode_" + t);
-            if (apuesta == null)
-            {
-                Debug.LogError($"No se encontró BetCode_{t} en Turn_{t}");
-            }
-            else
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    Transform pin = apuesta.Find("CodePin_" + i);
-                    if (pin == null)
-                    {
-                        Debug.LogError($"Faltante: CodePin_{i} en BetCode_{t}");
-                    }
-                    else if (pin.GetComponent<SpriteRenderer>() == null)
-                    {
-                        Debug.LogError($"CodePin_{i} en BetCode_{t} no tiene SpriteRenderer");
-                    }
-                }
-            }
-
-            // Response_X
-            Transform respuesta = turno.Find("Response_" + t);
-            if (respuesta == null)
-            {
-                Debug.LogError($"Faltante: contenedor Response_{t} en Turn_{t}");
-            }
-            else
-            {
-                for (int r = 0; r < 4; r++)
-                {
-                    Transform pin = respuesta.Find("ResponsePin_" + r);
-                    if (pin == null)
-                    {
-                        Debug.LogError($"Faltante: ResponsePin_{r} en Response_{t}");
-                    }
-                    else if (pin.GetComponent<SpriteRenderer>() == null)
-                    {
-                        Debug.LogError($"ResponsePin_{r} en Response_{t} no tiene SpriteRenderer");
-                    }
-                }
-            }
+            endGameAnimator.SetTrigger("Win");
         }
+        else { 
+            endGameAnimator.SetTrigger("Lose");
+        }            
 
-        Debug.Log("Validación completada.");
-    }*/
+       Invoke(nameof(ReloadScene), restartDelay);
+    }
+
+    private void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    /*  private void ValidateSetup()
+      {
+          Debug.Log("Validando estructura del tablero...");
+
+          if (gameControllerInstance == null) Debug.LogError("GameController no asignado");
+          if (turnControllerInstance == null) Debug.LogError("TurnController no asignado");
+          if (secretCodeGameObjet == null) Debug.LogError("secretCodeGameObjet no asignado");
+          if (coverGameObjet == null) Debug.LogError("coverGameObjet no asignado");
+
+          if (colorPins == null || colorPins.Count == 0)
+              Debug.LogError("Lista de ColorPins vacía o no asignada");
+
+          if (betTurns == null || betTurns.Count == 0)
+          {
+              Debug.LogError("Lista de betTurns vacía o no asignada");
+              return;
+          }
+
+          for (int t = 0; t < betTurns.Count; t++)
+          {
+              Transform turno = betTurns[t];
+              if (turno == null)
+              {
+                  Debug.LogError($"Turno {t} es null");
+                  continue;
+              }
+
+              //  BetCode_X
+              Transform apuesta = turno.Find("BetCode_" + t);
+              if (apuesta == null)
+              {
+                  Debug.LogError($"No se encontró BetCode_{t} en Turn_{t}");
+              }
+              else
+              {
+                  for (int i = 0; i < 4; i++)
+                  {
+                      Transform pin = apuesta.Find("CodePin_" + i);
+                      if (pin == null)
+                      {
+                          Debug.LogError($"Faltante: CodePin_{i} en BetCode_{t}");
+                      }
+                      else if (pin.GetComponent<SpriteRenderer>() == null)
+                      {
+                          Debug.LogError($"CodePin_{i} en BetCode_{t} no tiene SpriteRenderer");
+                      }
+                  }
+              }
+
+              // Response_X
+              Transform respuesta = turno.Find("Response_" + t);
+              if (respuesta == null)
+              {
+                  Debug.LogError($"Faltante: contenedor Response_{t} en Turn_{t}");
+              }
+              else
+              {
+                  for (int r = 0; r < 4; r++)
+                  {
+                      Transform pin = respuesta.Find("ResponsePin_" + r);
+                      if (pin == null)
+                      {
+                          Debug.LogError($"Faltante: ResponsePin_{r} en Response_{t}");
+                      }
+                      else if (pin.GetComponent<SpriteRenderer>() == null)
+                      {
+                          Debug.LogError($"ResponsePin_{r} en Response_{t} no tiene SpriteRenderer");
+                      }
+                  }
+              }
+          }
+
+          Debug.Log("Validación completada.");
+      }*/
 
 
 }

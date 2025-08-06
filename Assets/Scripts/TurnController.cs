@@ -7,7 +7,7 @@ public class TurnController : MonoBehaviour
     [SerializeField] private GameController gameControllerInstance;
     [SerializeField] private BoardManager boardManagerInstance;
     
-    public int currentTurnIndex;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -81,9 +81,36 @@ public class TurnController : MonoBehaviour
 
         return EvaluarApuesta(apuesta, secreto);
     }
-	public bool IsLastTurnPlayed()
+	/*public bool IsLastTurnPlayed()
 	{
         return currentTurnIndex >= boardManagerInstance.GetMaxTurn();
-	}
+
+	}*/
+
+    public void EndCurrentTurnAndActivateNext()
+    {
+        if (boardManagerInstance.betTurns == null || boardManagerInstance.betTurns.Count == 0) {
+            Debug.LogError("boardManagerInstance.betTurns no tiene un valor coherente");
+            return;
+        }
+         // 1. Bloquear turno actual
+        boardManagerInstance.SwitchBetTurn(false);
+        // 2. Avanzar turno
+        gameControllerInstance.currentTurnIndex++;
+        // 3. Activar siguiente turno si no hemos llegado al límite
+        if (gameControllerInstance.currentTurnIndex < boardManagerInstance.GetMaxTurn())
+        {
+            boardManagerInstance.SwitchBetTurn(true);
+        }
+        else
+        {
+            boardManagerInstance.SecretCodeCoverSwitch();
+            gameControllerInstance.EndGameVictory(false);
+            
+
+            // Aquí se puede desactivar botón o notificar al GameController
+        }
+    }
+
 
 }
