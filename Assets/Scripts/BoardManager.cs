@@ -245,15 +245,19 @@ public class BoardManager : MonoBehaviour
         }
         else { 
             endGameAnimator.SetTrigger("Lose");
-        }            
+        }
 
-       Invoke(nameof(ReloadScene), restartDelay);
+       // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
+         Invoke(nameof(ReloadScene), restartDelay);
     }
 
     private void ReloadScene()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
+
+
     /*  private void ValidateSetup()
       {
           Debug.Log("Validando estructura del tablero...");

@@ -370,74 +370,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6757781450728120189, guid: 0277e1ca667fef54bbe1c73a401dad9d, type: 3}
   m_PrefabInstance: {fileID: 26013803}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &49710022
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 49710023}
-  - component: {fileID: 49710024}
-  m_Layer: 0
-  m_Name: BackGroundVideo
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &49710023
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 49710022}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 228363840}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!328 &49710024
-VideoPlayer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 49710022}
-  m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: b59528b1bcd5c1a4097928cf9ee3f6bb, type: 3}
-  m_TargetCameraAlpha: 1
-  m_TargetCamera3DLayout: 0
-  m_TargetCamera: {fileID: 519420031}
-  m_TargetTexture: {fileID: 0}
-  m_TimeReference: 0
-  m_TargetMaterialRenderer: {fileID: 0}
-  m_TargetMaterialProperty: <noninit>
-  m_RenderMode: 0
-  m_AspectRatio: 1
-  m_DataSource: 0
-  m_TimeUpdateMode: 2
-  m_PlaybackSpeed: 1
-  m_AudioOutputMode: 2
-  m_TargetAudioSources:
-  - {fileID: 0}
-  m_DirectAudioVolumes:
-  - 1
-  m_Url: 
-  m_EnabledAudioTracks: 01
-  m_DirectAudioMutes: 00
-  m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
-  m_Looping: 1
-  m_WaitForFirstFrame: 1
-  m_FrameReadyEventEnabled: 0
-  m_VideoShaders: []
 --- !u!1 &107303907
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,7 +634,6 @@ Transform:
   m_LocalScale: {x: 12, y: 12, z: 6}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 49710023}
   - {fileID: 1637866134}
   - {fileID: 1550224398}
   - {fileID: 2060352682}
