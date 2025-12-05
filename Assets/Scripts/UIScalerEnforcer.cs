@@ -46,7 +46,7 @@ public class UIScalerEnforcer : MonoBehaviour
     public void EnforceCanvasScaling()
     {
         // Find all Canvases, not just existing Scalers, so we can add Scalers if missing
-        Canvas[] canvases = FindObjectsOfType<Canvas>();
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None );
 
         foreach (var canvas in canvases)
         {
